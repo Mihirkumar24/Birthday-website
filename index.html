@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Happy Birthday, Wifey ❤️</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;600;800;900&family=Dancing+Script:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg1:#0c0410;
+    --bg2:#3a0f36;
+    --accent:#ff6b9f;
+    --accent2:#ff9ab6;
+    --gold:#ffd27f;
+    --text:#fff;
+    --muted: rgba(255,255,255,0.65);
+    --card: rgba(255,255,255,0.03);
+    --glass: rgba(255,255,255,0.04);
+    --blur: 12px;
+    --nav-h:72px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;font-family:Inter, "Segoe UI", Roboto, Arial; -webkit-font-smoothing:antialiased;background:linear-gradient(120deg,var(--bg1),var(--bg2));color:var(--text);-webkit-font-smoothing:antialiased;}
+  body{min-height:100vh;overflow:hidden;display:flex;flex-direction:column;}
+
+  /* NAV (compact, responsive) */
+  nav{height:var(--nav-h);display:flex;align-items:center;justify-content:space-between;padding:12px 20px;gap:12px;z-index:40}
+  .brand{display:flex;gap:12px;align-items:center}
+  .logo{width:50px;height:50px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--gold));display:flex;align-items:center;justify-content:center;font-weight:800;color:#1a0b0f;flex:0 0 50px}
+  .title{font-size:18px;font-weight:700}
+  .subtitle{font-size:12px;color:var(--muted)}
+
+  .nav-actions{display:flex;gap:10px;align-items:center}
+  .nav-btn{
+    background:linear-gradient(90deg,var(--accent),var(--gold));
+    border:none;color:#11050a;padding:10px 14px;border-radius:12px;font-weight:800;cursor:pointer;box-shadow:0 12px 36px rgba(0,0,0,0.4)
+  }
+
+  /* full-bleed canvas */
+  .canvas{
+    width:100vw; height:calc(100vh - var(--nav-h)); margin:0; padding:0; position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center;
+  }
+  .bg-decor{
+    position:absolute; inset:0; pointer-events:none; z-index:0;
+    background:
+      radial-gradient(1000px 360px at 6% 18%, rgba(255,107,159,0.06), transparent 6%),
+      radial-gradient(900px 300px at 92% 82%, rgba(255,210,127,0.03), transparent 10%);
+  }
+
+  /* loop heading (responsive) */
+  .loop-text { position:relative; z-index:4; text-align:center; pointer-events:none; width:100%; padding:0 18px; box-sizing:border-box; max-width:1400px; margin:auto; }
+  .loop-text .line{
+    font-weight:900;
+    font-size: clamp(28px, 8.5vw, 120px);
+    line-height:0.95;
+    letter-spacing:-1px;
+    text-transform:uppercase;
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    background-image: linear-gradient(90deg, var(--accent), var(--accent2), var(--gold));
+    filter:drop-shadow(0 22px 48px rgba(255,107,159,0.12));
+    opacity:0;
+    transform:translateY(18px) scale(0.98);
+    transition: all 700ms cubic-bezier(.22,.9,.3,1);
+    display:block;
+    white-space:nowrap;
+  }
+  .loop-text .line.show{ opacity:1; transform:translateY(0) scale(1); }
+  .loop-sub{ margin-top:10px; font-size:clamp(12px, 1.8vw, 18px); color:var(--muted); opacity:0.95; text-align:center; }
+
+  /* hearts falling */
+  .hearts { position:absolute; inset:0; pointer-events:none; z-index:2; overflow:hidden; }
+  .heart { position:absolute; transform-origin:center; opacity:0.9; will-change:transform, opacity; filter:drop-shadow(0 8px 22px rgba(255,107,159,0.08)); }
+  .heart svg{ width:100%; height:100%; display:block; }
+
+  /* PhotoBooth modal */
+  .modal{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; z-index:9999; background:linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.64)); opacity:0; pointer-events:none; transition:opacity 220ms ease; }
+  .modal.show{ opacity:1; pointer-events:auto; }
+  .modal-card{ width:min(1000px,94%); max-height:86vh; overflow:hidden; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.014)); border-radius:16px; padding:16px; box-shadow:0 40px 120px rgba(0,0,0,0.6); backdrop-filter: blur(var(--blur)); border:1px solid rgba(255,255,255,0.03); }
+  .modal-header{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .modal-title{ font-size:20px; font-weight:900; }
+  .modal-close{ background:transparent; border:1px solid rgba(255,255,255,0.06); padding:8px 10px; border-radius:10px; color:var(--muted); cursor:pointer; }
+
+  .slides-stage{ position:relative; background:rgba(0,0,0,0.12); border-radius:12px; min-height:420px; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  .slide{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; opacity:0; transform:scale(1.04); transition:opacity 900ms ease, transform 900ms ease; }
+  .slide.show{ opacity:1; transform:scale(1); }
+  .slide img{ max-width:100%; max-height:100%; object-fit:cover; display:block; border-radius:8px; }
+
+  .caption{ position:absolute; left:16px; bottom:12px; background:linear-gradient(90deg, rgba(0,0,0,0.28), rgba(0,0,0,0.18)); padding:8px 12px; border-radius:10px; color:#fff; font-weight:700; font-size:14px; }
+
+  .controls-row{ display:flex; gap:10px; align-items:center; justify-content:flex-end; margin-top:12px; }
+  .controls-row button{ padding:10px 12px; border-radius:10px; border:none; background:var(--glass); color:var(--text); cursor:pointer; font-weight:800; }
+  .controls-row .primary{ background:linear-gradient(90deg,var(--accent),var(--gold)); color:#11050a; }
+
+  /* Make modals full-screen on mobile for usability */
+  @media (max-width:720px){
+    .modal-card{ width:100vw; height:100vh; border-radius:0; padding:14px; max-height:100vh; display:flex; flex-direction:column; }
+    .slides-stage{ min-height:56vh; border-radius:12px; }
+    .loop-text .line{ white-space:normal; text-align:center; font-size:clamp(24px,9.6vw,56px); }
+  }
+
+  /* very small screens */
+  @media (max-width:420px){
+    nav{padding:10px 12px}
+    .logo{width:44px;height:44px}
+    .loop-sub{ font-size:14px }
+    .controls-row button{ padding:12px 14px; font-size:15px; }
+  }
+</style>
+</head>
+<body>
+  <nav>
+    <div class="brand">
+      <div class="logo">W</div>
+      <div>
+        <div class="title">Happy Birthday, Wifey</div>
+        <div class="subtitle">A small world of love, made by Mihir</div>
+      </div>
+    </div>
+
+    <div class="nav-actions">
+      <button class="nav-btn" id="loveBtn">Love Letter</button>
+      <button class="nav-btn" id="photoBtn">PhotoBooth</button>
+    </div>
+  </nav>
+
+  <div class="canvas">
+    <div class="bg-decor" aria-hidden="true"></div>
+    <div class="hearts" id="hearts"></div>
+
+    <div class="loop-text" aria-live="polite">
+      <span class="line" id="line0">Happy Birthday, my love</span>
+      <span class="line" id="line1">You are my everything</span>
+      <span class="line" id="line2">May your day be full of joy</span>
+      <span class="line" id="line3">To the one I adore — ❤️</span>
+      <div class="loop-sub">Forever and always</div>
+    </div>
+  </div>
+
+  <!-- PhotoBooth modal -->
+  <div class="modal" id="photoboothModal" aria-hidden="true" role="dialog">
+    <div class="modal-card" role="document">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">PhotoBooth</div>
+          <div style="font-size:13px;color:var(--muted);margin-top:6px">Enjoy a beautiful loop of photos — defined inside the code.</div>
+        </div>
+        <div>
+          <button class="modal-close" id="closePhoto">Close ✕</button>
+        </div>
+      </div>
+
+      <div class="slides-stage" id="slidesStage" aria-live="polite">
+        <!-- slides inserted by JS -->
+      </div>
+
+      <div class="controls-row">
+        <button id="prevBtn">Prev</button>
+        <button id="playPauseBtn" class="primary">Pause</button>
+        <button id="nextBtn">Next</button>
+        <button id="shuffleBtn">Shuffle</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Love Letter modal -->
+  <div class="modal" id="letterModal" role="dialog" aria-hidden="true" style="z-index:9998">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">A Letter For You</div>
+          <div style="font-size:13px;color:var(--muted);margin-top:6px">Typed with a little magic — press Replay to see it again.</div>
+        </div>
+        <div>
+          <button class="modal-close" id="closeLetter">Close ✕</button>
+        </div>
+      </div>
+
+      <div style="margin-top:14px;background:linear-gradient(0deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.02);min-height:240px;overflow:auto">
+        <div id="typedLetter" style="font-family:Georgia,serif;color:rgba(255,255,255,0.95);font-size:18px;line-height:1.8;white-space:pre-wrap"></div>
+        <span id="letterCursor" style="display:none;width:10px;height:22px;background:linear-gradient(180deg,var(--accent),var(--gold));margin-left:6px;vertical-align:middle;border-radius:4px;animation:blink 900ms steps(1) infinite"></span>
+      </div>
+
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
+        <button id="replayLetter" style="padding:8px 12px;border-radius:10px;border:none;background:var(--glass);color:var(--text);font-weight:800">Replay</button>
+        <button id="pauseLetter" style="padding:8px 12px;border-radius:10px;border:none;background:var(--glass);color:var(--text);font-weight:800">Pause</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ====== Looping heading ====== */
+(function(){
+  const lines = Array.from(document.querySelectorAll('.loop-text .line'));
+  let idx = 0;
+  const showDuration = 2600;
+  function showIndex(i){ lines.forEach((el, j)=> el.classList.toggle('show', j===i)); }
+  showIndex(0);
+  setInterval(()=> { idx = (idx + 1) % lines.length; showIndex(idx); }, showDuration);
+})();
+
+/* ====== Falling hearts (adaptive for mobile) ====== */
+(function(){
+  const container = document.getElementById('hearts');
+  const colors = ['#ff6b9f','#ffd27f','#ff9ab6','#ffbfd6'];
+  const isMobile = window.matchMedia('(max-width:720px)').matches;
+  const minSize = isMobile ? 10 : 14;
+  const maxSize = isMobile ? 40 : 46;
+  const minDelay = isMobile ? 280 : 200;
+  const maxDelay = isMobile ? 650 : 900;
+
+  function makeHeart(){
+    const h = document.createElement('div');
+    h.className = 'heart';
+    const size = (Math.random() * (maxSize - minSize) + minSize) | 0;
+    h.style.width = size + 'px';
+    h.style.height = size + 'px';
+    h.style.left = (Math.random() * 100) + '%';
+    h.style.top = '-10%';
+    h.style.opacity = (Math.random()*0.5 + 0.35).toFixed(2);
+    const rot = (Math.random()*80 - 40) | 0;
+    h.style.transform = `rotate(${rot}deg)`;
+    const color = colors[Math.floor(Math.random()*colors.length)];
+    h.innerHTML = `<svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet"><path fill="${color}" d="M12 21s-7.61-4.998-10-8.5C-1.5 8.2 4.5 3 7.5 5.25 9.2 6.6 12 9.25 12 9.25s2.8-2.65 4.5-3.99C19.5 3 25.5 8.2 22 12.5 19.61 16.002 12 21 12 21z"/></svg>`;
+    container.appendChild(h);
+
+    const duration = Math.random()*(isMobile ? 4200 : 5200) + (isMobile ? 4200 : 5200);
+    const driftX = (Math.random()*240 - 120);
+    const keyframes = [
+      { transform: `translate(0, 0) rotate(${rot}deg)`, opacity: h.style.opacity },
+      { transform: `translate(${driftX}px, ${window.innerHeight * 1.2}px) rotate(${rot+40}deg)`, opacity: 0.06 }
+    ];
+    const anim = h.animate(keyframes, { duration: duration, easing: 'cubic-bezier(.18,.9,.3,1)' });
+    anim.onfinish = () => h.remove();
+  }
+
+  (function spawner(){ makeHeart(); setTimeout(spawner, Math.random()*maxDelay + minDelay); })();
+})();
+
+/* ====== PhotoBooth ====== */
+/* If using local files, update PHOTOS paths to match your structure.
+   Example path used earlier: /mnt/data/IMG_20240618_080547.jpg (change if needed). */
+const PHOTOS = [
+  '/mnt/data/IMG_20240618_080547.jpg',
+  '/mnt/data/IMG_20240618_080547.jpg',
+  '/mnt/data/IMG_20240618_080547.jpg'
+];
+
+const photoBtn = document.getElementById('photoBtn');
+const photomodal = document.getElementById('photoboothModal');
+const closePhoto = document.getElementById('closePhoto');
+const slidesStage = document.getElementById('slidesStage');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const playPauseBtn = document.getElementById('playPauseBtn');
+const shuffleBtn = document.getElementById('shuffleBtn');
+
+let slides = [], slideIndex = 0, slideTimer = null, playing = true;
+const SLIDE_DURATION = 3500;
+
+function buildSlides(){
+  slidesStage.innerHTML = '';
+  slides = PHOTOS.map((src, i) => ({ src, i }));
+  if(slides.length === 0){
+    slidesStage.innerHTML = '<div style="padding:30px;color:var(--muted);font-weight:800;text-align:center">No photos defined. Edit the PHOTOS array.</div>';
+    stopSlideshow();
+    return;
+  }
+  slides.forEach((s, i) => {
+    const el = document.createElement('div');
+    el.className = 'slide';
+    el.dataset.index = i;
+    const img = document.createElement('img');
+    img.src = s.src;
+    img.alt = `Photo ${i+1}`;
+    img.onerror = ()=> { img.style.objectFit='contain'; img.src = 'data:image/svg+xml;utf8,' +
+      encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500"><rect width="100%" height="100%" fill="#2b1722"/><text x="50%" y="50%" fill="#fff" font-size="22" font-family="Arial" text-anchor="middle">Image not found</text></svg>'); };
+    el.appendChild(img);
+    const cap = document.createElement('div');
+    cap.className = 'caption';
+    cap.textContent = (s.src||'').split('/').pop();
+    el.appendChild(cap);
+    slidesStage.appendChild(el);
+  });
+  showSlide(0);
+}
+
+function showSlide(i){
+  const els = Array.from(slidesStage.querySelectorAll('.slide'));
+  if(els.length === 0) return;
+  if(i < 0) i = els.length - 1;
+  if(i >= els.length) i = 0;
+  slideIndex = i;
+  els.forEach((el, idx) => {
+    el.classList.toggle('show', idx === i);
+    const img = el.querySelector('img');
+    if(idx === i && img){
+      // apply a subtle ken-burns using transform over slide duration
+      img.style.transition = `transform ${SLIDE_DURATION - 200}ms ease-in-out`;
+      const tx = (Math.random()*16 - 8);
+      const ty = (Math.random()*10 - 5);
+      img.style.transform = `scale(1.02) translate(${tx}px, ${ty}px)`;
+      img.style.opacity = '1';
+    } else if(img) {
+      img.style.opacity = '0';
+      img.style.transform = 'scale(1)';
+    }
+  });
+}
+
+function startSlideshow(){
+  if(slides.length === 0) return;
+  playing = true;
+  playPauseBtn.textContent = 'Pause';
+  if(slideTimer) clearInterval(slideTimer);
+  slideTimer = setInterval(()=> {
+    slideIndex = (slideIndex + 1) % slides.length;
+    showSlide(slideIndex);
+  }, SLIDE_DURATION);
+}
+function stopSlideshow(){
+  playing = false;
+  playPauseBtn.textContent = 'Play';
+  if(slideTimer){ clearInterval(slideTimer); slideTimer = null; }
+}
+function togglePlayPause(){ if(playing) stopSlideshow(); else startSlideshow(); }
+
+prevBtn?.addEventListener('click', ()=> { showSlide(slideIndex - 1); if(playing) restartSlideshow(); });
+nextBtn?.addEventListener('click', ()=> { showSlide(slideIndex + 1); if(playing) restartSlideshow(); });
+function restartSlideshow(){ stopSlideshow(); startSlideshow(); }
+
+shuffleBtn?.addEventListener('click', ()=> {
+  for(let i = slides.length -1; i>0; i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [slides[i], slides[j]] = [slides[j], slides[i]];
+  }
+  PHOTOS.length = 0;
+  slides.forEach(s => PHOTOS.push(s.src));
+  buildSlides();
+  showSlide(0);
+  if(playing) restartSlideshow();
+});
+
+photoBtn.addEventListener('click', ()=> {
+  buildSlides();
+  photomodal.classList.add('show');
+  photomodal.setAttribute('aria-hidden','false');
+  document.body.style.overflow = 'hidden';
+  if(slides.length) startSlideshow(); else { playing=false; playPauseBtn.textContent='Play'; }
+});
+closePhoto.addEventListener('click', ()=> {
+  photomodal.classList.remove('show');
+  photomodal.setAttribute('aria-hidden','true');
+  document.body.style.overflow = '';
+  stopSlideshow();
+});
+
+// play/pause
+playPauseBtn.addEventListener('click', togglePlayPause);
+
+// keyboard nav while modal open
+document.addEventListener('keydown', (e)=>{
+  if(photomodal.classList.contains('show')){
+    if(e.key === 'ArrowLeft'){ prevBtn.click(); }
+    if(e.key === 'ArrowRight'){ nextBtn.click(); }
+    if(e.key === ' '){ e.preventDefault(); playPauseBtn.click(); }
+    if(e.key === 'Escape'){ closePhoto.click(); }
+  }
+});
+
+// clicking outside to close
+photomodal.addEventListener('click', (ev)=>{ if(ev.target === photomodal) closePhoto.click(); });
+
+/* ====== Love Letter modal (responsive) ====== */
+const loveBtn = document.getElementById('loveBtn');
+const letterModal = document.getElementById('letterModal');
+const closeLetter = document.getElementById('closeLetter');
+const typedLetter = document.getElementById('typedLetter');
+const letterCursor = document.getElementById('letterCursor');
+const replayLetter = document.getElementById('replayLetter');
+const pauseLetter = document.getElementById('pauseLetter');
+
+const letterLines = [
+  "My dearest,",
+  "",
+  "On this special morning I woke thinking how lucky I am to have you. Your smile turns everyday moments into stories I want to keep forever.",
+  "",
+  "You have a quiet strength that calms me and a laugh that colors my days brighter than sunrise. Today I promise to make you feel as treasured as you make me feel.",
+  "",
+  "May the candles glow for every wish you keep; may laughter find you at every turn.",
+  "",
+  "Always yours,",
+  "— Mihir"
+];
+
+let typingTimer=null, li=0, ci=0, letterPaused=false;
+const TYPING_SPEED = 28;
+function openLetterModal(){ letterModal.classList.add('show'); letterModal.setAttribute('aria-hidden','false'); document.body.style.overflow = 'hidden'; startTyping(true); }
+function closeLetterModal(){ letterModal.classList.remove('show'); letterModal.setAttribute('aria-hidden','true'); document.body.style.overflow = ''; stopTyping(); typedLetter.textContent = ''; letterCursor.style.display = 'none'; }
+loveBtn.addEventListener('click', openLetterModal);
+closeLetter.addEventListener('click', closeLetterModal);
+
+function startTyping(fromStart=true){
+  stopTyping();
+  if(fromStart){ typedLetter.textContent=''; li=0; ci=0; }
+  letterPaused=false; letterCursor.style.display='inline-block';
+  typingTimer = setInterval(()=> {
+    if(letterPaused) return;
+    const line = letterLines[li] || '';
+    if(ci < line.length){ typedLetter.textContent += line[ci]; ci++; }
+    else { typedLetter.textContent += "\n"; li++; ci=0; }
+    if(li >= letterLines.length){ stopTyping(); letterCursor.style.display = 'none'; }
+    typedLetter.parentElement.scrollTop = typedLetter.parentElement.scrollHeight;
+  }, TYPING_SPEED);
+}
+function stopTyping(){ if(typingTimer) clearInterval(typingTimer); typingTimer=null; }
+replayLetter.addEventListener('click', ()=> startTyping(true));
+pauseLetter.addEventListener('click', ()=> { letterPaused = !letterPaused; pauseLetter.textContent = letterPaused ? 'Resume' : 'Pause'; });
+
+// close letter modal on outside click
+letterModal.addEventListener('click', (e)=> { if(e.target === letterModal) closeLetterModal(); });
+
+// accessibility: escape closes modals
+document.addEventListener('keydown', (e)=> {
+  if(e.key === 'Escape'){
+    document.querySelectorAll('.modal.show').forEach(m => { m.classList.remove('show'); m.setAttribute('aria-hidden','true'); });
+    document.body.style.overflow = '';
+  }
+});
+
+/* Prevent accidental drag */
+document.addEventListener('dragover', e => e.preventDefault());
+document.addEventListener('drop', e => e.preventDefault());
+</script>
+</body>
+</html>
