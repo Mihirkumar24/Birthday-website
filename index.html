@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <title>Happy Birthday — A little world of love</title>
 
-<!-- Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;900&family=Poppins:wght@300;500;700;900&family=Dancing+Script:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
@@ -23,9 +22,10 @@
 
   *{box-sizing:border-box}
   html,body{height:100%;margin:0;background:linear-gradient(140deg,var(--bg1),var(--bg2));-webkit-font-smoothing:antialiased;font-family:'Poppins',system-ui,Segoe UI,Roboto,Arial;color:#fff}
-  body{min-height:100vh;display:flex;flex-direction:column;overflow:hidden}
+  /* allow vertical scrolling so big type never gets cropped */
+  body{min-height:100vh;display:flex;flex-direction:column;overflow:auto}
 
-  /* NAV */
+/* NAV */
   nav{height:var(--nav-h);display:flex;align-items:center;justify-content:space-between;padding:12px 18px;gap:12px;z-index:40}
   .brand{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
   .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent1),var(--gold));display:flex;align-items:center;justify-content:center;font-weight:900;color:#120407;box-shadow:0 18px 48px rgba(0,0,0,0.55)}
@@ -35,15 +35,22 @@
   .nav-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
   .nav-btn{background:linear-gradient(90deg,var(--accent1),var(--gold));border:none;color:#120407;padding:10px 14px;border-radius:14px;font-weight:800;cursor:pointer;box-shadow:0 12px 36px rgba(0,0,0,0.4);font-family:'Poppins';font-size:15px}
 
-  /* Canvas: allow vertical scroll on small screens so text never gets cropped */
+/* Canvas: allow vertical scroll on small screens and overall */
   .canvas{
-    width:100vw;height:calc(100vh - var(--nav-h));position:relative;overflow:auto;display:flex;align-items:center;justify-content:center;padding:26px 18px;
+    width:100vw;
+    min-height:calc(100vh - var(--nav-h));
+    position:relative;
+    overflow:auto;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:42px 18px 64px;
   }
   .bg-decor{position:absolute;inset:-20% -10%;pointer-events:none;z-index:0;background:
     radial-gradient(1000px 340px at 6% 14%, rgba(255,107,159,0.06), transparent 8%),
     radial-gradient(900px 320px at 92% 82%, rgba(255,210,127,0.02), transparent 10%);}
 
-  /* Center container width control to avoid cropping while keeping large type */
+/* Center container */
   .center{
     z-index:6;
     width:100%;
@@ -54,62 +61,88 @@
     margin:auto;
   }
 
-  /* Heading (Playfair Display) — responsive, wraps nicely */
+/* Headline: gradient applied on container and each char inherits it.
+   Important: allow normal wrapping (no forced single-line) and good line-height */
   .headline{
     font-family:'Playfair Display', serif;
     font-weight:900;
-    font-size: clamp(34px, 8.5vw, 108px);
-    line-height: clamp(1.0, 0.95, 1.02);
+    display:block;              /* allow wrapping and avoid inline-block clipping */
+    font-size: clamp(36px, 8.5vw, 108px);
+    line-height: clamp(1.02, 1.02, 1.12);  /* slightly looser to avoid overlap */
     margin:0 auto 12px;
     letter-spacing:-0.6px;
-    color:transparent;
-    -webkit-background-clip:text;background-clip:text;
-    background-image: linear-gradient(90deg,var(--accent1),var(--accent2),var(--gold));
-    text-wrap:balance; /* best-effort balancing */
-    word-break:break-word;
-    hyphens:auto;
-    text-shadow:0 28px 64px rgba(255,107,159,0.10);
-    display:block;
-    /* ensure the headline is readable and not clipped:
-       allow it to take up to 90% of viewport width and flow to next line */
     max-width:92%;
+    position:relative;
+    background-image: linear-gradient(90deg,var(--accent1),var(--accent2),var(--gold));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    word-wrap: break-word;
+    word-break: break-word;
+    hyphens: auto;
+    text-shadow:0 28px 64px rgba(255,107,159,0.10);
   }
 
-  .subline{
-    font-family:'Dancing Script',cursive;
-    font-size: clamp(15px, 2.8vw, 22px);
-    color:var(--muted);
-    margin-top:12px;
+  /* per-character span: inherits gradient and animates in */
+  .headline .char{
+    display:inline-block;
+    opacity:0;
+    transform: translateY(20px) rotate(-4deg) scale(0.9);
+    white-space:pre;
+    -webkit-background-clip: text;
+    background-clip: text;
+    background-image: linear-gradient(90deg,var(--accent1),var(--accent2),var(--gold));
+    color: transparent;
+    will-change: transform, opacity;
   }
+
+  @keyframes charPop {
+    0% { opacity:0; transform: translateY(20px) rotate(-6deg) scale(0.84); filter: blur(2px); }
+    45% { opacity:1; transform: translateY(-8px) rotate(6deg) scale(1.06); filter:none; }
+    70% { transform: translateY(4px) rotate(-2deg) scale(0.98); }
+    100% { opacity:1; transform: translateY(0) rotate(0deg) scale(1); }
+  }
+  @keyframes charWave {
+    0% { opacity:0; transform: translateY(14px) rotate(8deg) scale(.92) }
+    50% { opacity:1; transform: translateY(-10px) rotate(-4deg) scale(1.08) }
+    100% { opacity:1; transform: translateY(0) rotate(0) scale(1) }
+  }
+
+  .subline{ font-family:'Dancing Script',cursive; font-size: clamp(15px, 2.8vw, 22px); color:var(--muted); margin-top:18px; opacity:0; transform: translateY(6px); transition:opacity 420ms ease, transform 420ms ease; }
+  .subline.show{ opacity:1; transform: translateY(0); }
 
   .help{margin-top:34px;color:var(--muted);font-weight:600}
 
-  /* Falling particles layer */
+/* Particles */
   .particles{position:absolute;inset:0;pointer-events:none;z-index:2;overflow:hidden}
   .heart{position:absolute;will-change:transform,opacity;filter:drop-shadow(0 8px 22px rgba(255,107,159,0.08));width:26px;height:26px}
   .star{position:absolute;width:10px;height:10px;will-change:transform,opacity,filter;filter:drop-shadow(0 8px 22px rgba(255,210,127,0.06));opacity:0.9}
 
-  /* subtle shimmer for stars */
-  @keyframes twinkle {
-    0%{ transform: scale(0.9) rotate(0deg); opacity:0.75; filter:brightness(1); }
-    50%{ transform: scale(1.4) rotate(18deg); opacity:1; filter:brightness(1.6); }
-    100%{ transform: scale(0.9) rotate(0deg); opacity:0.75; filter:brightness(1); }
-  }
-
-  /* modal basics */
+/* modal adjustments: ensure modal content scrolls if long */
   .modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:9999;background:linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.6));opacity:0;pointer-events:none;transition:opacity 220ms}
   .modal.show{opacity:1;pointer-events:auto}
-  .modal-card{width:min(980px,94%);max-height:86vh;overflow:hidden;background:linear-gradient(180deg, rgba(255,255,255,0.018), rgba(255,255,255,0.01));border-radius:14px;padding:16px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 30px 90px rgba(0,0,0,0.6);backdrop-filter:blur(10px)}
+  .modal-card{
+    width:min(980px,94%);
+    max-height:86vh;
+    display:flex;
+    flex-direction:column; /* allow header + body + footer */
+    background:linear-gradient(180deg, rgba(255,255,255,0.018), rgba(255,255,255,0.01));
+    border-radius:14px;padding:16px;border:1px solid rgba(255,255,255,0.03);
+    box-shadow:0 30px 90px rgba(0,0,0,0.6);backdrop-filter:blur(10px);
+  }
   .modal-header{display:flex;justify-content:space-between;align-items:center}
   .modal-title{font-size:20px;font-weight:900}
   .modal-close{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 10px;border-radius:10px;color:var(--muted);cursor:pointer}
 
+  .modal-body{flex:1; overflow:auto; margin-top:12px}
+
+/* slides */
   .slides-stage{position:relative;background:rgba(0,0,0,0.12);border-radius:12px;min-height:420px;display:flex;align-items:center;justify-content:center;overflow:hidden}
   .slide{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transform:scale(1.06);transition:opacity 900ms ease, transform 900ms ease}
   .slide.show{opacity:1;transform:scale(1)}
   .slide img{max-width:100%;max-height:100%;object-fit:cover;border-radius:8px}
 
-  /* Responsive adjustments */
+/* responsive */
   @media (max-width:920px){
     .headline{font-size:clamp(28px, 10.8vw, 84px);max-width:96%}
     .center{padding:7vh 12px 9vh}
@@ -118,7 +151,7 @@
     nav{padding:10px 12px}
     .logo{width:48px;height:48px}
     .nav-btn{padding:10px 12px;font-size:14px}
-    .headline{font-size:clamp(22px, 14vw, 52px);line-height:1.06}
+    .headline{font-size:clamp(22px, 14vw, 52px);line-height:1.08}
     .subline{font-size:16px}
     .center{padding:9vh 10px 11vh}
   }
@@ -150,8 +183,9 @@
   <div class="particles" id="particles"></div>
 
   <div class="center" role="main" aria-live="polite">
-    <h1 class="headline" id="headline">You are my everything</h1>
-    <div class="subline">Forever and always — with all my heart</div>
+    <!-- headline will be built by JS per-letter -->
+    <h1 class="headline" id="headline" aria-hidden="false"></h1>
+    <div class="subline" id="subline">Forever and always — with all my heart</div>
     <div class="help">Tap <strong>Love Letter</strong> for a little surprise!</div>
   </div>
 </div>
@@ -167,18 +201,20 @@
       <div><button class="modal-close" id="closePhoto">Close ✕</button></div>
     </div>
 
-    <div class="slides-stage" id="slidesStage" aria-live="polite" style="margin-top:12px"></div>
+    <div class="modal-body">
+      <div class="slides-stage" id="slidesStage" aria-live="polite" style="margin-top:0"></div>
 
-    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
-      <button id="prevBtn" class="nav-btn" style="background:var(--glass);color:var(--muted)">Prev</button>
-      <button id="playPauseBtn" class="nav-btn" style="background:linear-gradient(90deg,var(--accent1),var(--gold));color:#120407">Pause</button>
-      <button id="nextBtn" class="nav-btn" style="background:var(--glass);color:var(--muted)">Next</button>
-      <button id="shuffleBtn" class="nav-btn" style="background:var(--glass);color:var(--muted)">Shuffle</button>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+        <button id="prevBtn" class="nav-btn" style="background:var(--glass);color:var(--muted)">Prev</button>
+        <button id="playPauseBtn" class="nav-btn" style="background:linear-gradient(90deg,var(--accent1),var(--gold));color:#120407">Pause</button>
+        <button id="nextBtn" class="nav-btn" style="background:var(--glass);color:var(--muted)">Next</button>
+        <button id="shuffleBtn" class="nav-btn" style="background:var(--glass);color:var(--muted)">Shuffle</button>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- Love Letter modal (kept) -->
+<!-- Love Letter modal -->
 <div class="modal" id="letterModal" role="dialog" aria-hidden="true" style="z-index:9998">
   <div class="modal-card">
     <div class="modal-header">
@@ -189,7 +225,7 @@
       <div><button class="modal-close" id="closeLetter">Close ✕</button></div>
     </div>
 
-    <div style="margin-top:14px;background:linear-gradient(0deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.02);min-height:240px;overflow:auto">
+    <div class="modal-body" style="background:linear-gradient(0deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.02);min-height:240px;">
       <div id="typedLetter" style="font-family:Georgia,serif;color:rgba(255,255,255,0.95);font-size:18px;line-height:1.8;white-space:pre-wrap"></div>
       <span id="letterCursor" style="display:none;width:10px;height:22px;background:linear-gradient(180deg,var(--accent1),var(--gold));margin-left:6px;vertical-align:middle;border-radius:4px;animation:blink 900ms steps(1) infinite"></span>
     </div>
@@ -202,76 +238,59 @@
 </div>
 
 <script>
-/* ===== Particle system: hearts + stars (more dense on desktop, adaptive on mobile) ===== */
+/* ===== Particles (denser & responsive) ===== */
 (function(){
   const container = document.getElementById('particles');
   const isMobile = window.matchMedia('(max-width:720px)').matches;
 
-  // Particle settings
   const hearts = {
     colors: ['#ff6b9f','#ff9ab6','#ffd27f','#ffbfd6'],
     minSize: isMobile ? 8 : 14,
     maxSize: isMobile ? 26 : 46,
-    minInterval: isMobile ? 360 : 180,
-    maxInterval: isMobile ? 900 : 600
+    minInterval: isMobile ? 360 : 120,
+    maxInterval: isMobile ? 900 : 420
   };
   const stars = {
     colors: ['#ffd27f','#fff6d9','#fff2d1'],
     minSize: isMobile ? 6 : 8,
     maxSize: isMobile ? 10 : 14,
-    minInterval: isMobile ? 150 : 80,
-    maxInterval: isMobile ? 500 : 260
+    minInterval: isMobile ? 100 : 60,
+    maxInterval: isMobile ? 420 : 200
   };
 
-  // Make a heart element and animate it falling
   function spawnHeart(){
-    const el = document.createElement('div');
-    el.className = 'heart';
+    const el = document.createElement('div'); el.className = 'heart';
     const size = Math.floor(Math.random()*(hearts.maxSize - hearts.minSize) + hearts.minSize);
-    el.style.width = size + 'px';
-    el.style.height = size + 'px';
-    el.style.left = (Math.random()*100) + '%';
-    el.style.top = '-10%';
+    el.style.width = size + 'px'; el.style.height = size + 'px';
+    el.style.left = (Math.random()*100) + '%'; el.style.top = '-10%';
     el.style.opacity = (Math.random()*0.5 + 0.35).toFixed(2);
-    const rot = Math.floor(Math.random()*80 - 40);
-    el.style.transform = `rotate(${rot}deg)`;
+    const rot = Math.floor(Math.random()*80 - 40); el.style.transform = `rotate(${rot}deg)`;
     const color = hearts.colors[Math.floor(Math.random()*hearts.colors.length)];
     el.innerHTML = `<svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet"><path fill="${color}" d="M12 21s-7.61-4.998-10-8.5C-1.5 8.2 4.5 3 7.5 5.25 9.2 6.6 12 9.25 12 9.25s2.8-2.65 4.5-3.99C19.5 3 25.5 8.2 22 12.5 19.61 16.002 12 21 12 21z"/></svg>`;
     container.appendChild(el);
-
-    const duration = Math.random()*(isMobile ? 4200 : 5200) + (isMobile ? 4200 : 5200);
-    const driftX = (Math.random()*360 - 180);
+    const duration = Math.random()*(4200) + 4200;
+    const driftX = (Math.random()*420 - 210);
     const endY = window.innerHeight * (isMobile ? 1.05 : 1.25);
-    const anim = el.animate([
+    el.animate([
       { transform: `translate(0,0) rotate(${rot}deg)`, opacity: el.style.opacity },
       { transform: `translate(${driftX}px, ${endY}px) rotate(${rot + 40}deg)`, opacity: 0.06 }
-    ], { duration, easing: 'cubic-bezier(.18,.9,.3,1)'});
-    anim.onfinish = ()=> el.remove();
+    ], { duration, easing: 'cubic-bezier(.18,.9,.3,1)'} ).onfinish = ()=> el.remove();
   }
 
-  // Make a star sparkle and fall
   function spawnStar(){
-    const el = document.createElement('div');
-    el.className = 'star';
+    const el = document.createElement('div'); el.className = 'star';
     const size = Math.floor(Math.random()*(stars.maxSize - stars.minSize) + stars.minSize);
-    el.style.width = size + 'px';
-    el.style.height = size + 'px';
-    el.style.left = (Math.random()*100) + '%';
-    el.style.top = '-6%';
+    el.style.width = size + 'px'; el.style.height = size + 'px';
+    el.style.left = (Math.random()*100) + '%'; el.style.top = '-6%';
     const color = stars.colors[Math.floor(Math.random()*stars.colors.length)];
-    // simple star svg (diamond-like)
     el.innerHTML = `<svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet"><path fill="${color}" d="M12 2l1.9 4.5L18.8 8l-4 3.2L15 16l-3-1.9L9 16l.2-4.8L5.2 8 10 6.5z"/></svg>`;
     container.appendChild(el);
-
-    // twinkle while falling
-    const driftX = (Math.random()*320 - 160);
+    const driftX = (Math.random()*360 - 180);
     const duration = Math.random()*(isMobile ? 3800 : 2600) + (isMobile ? 2400 : 1800);
     el.animate([
-      { transform: 'translate(0,0) scale(0.9)', opacity: 0.85, filter:'brightness(1)' },
-      { transform: `translate(${driftX}px, ${window.innerHeight * (isMobile ? 0.9 : 1.05)}px) scale(1.4)`, opacity: 0.08, filter:'brightness(1.6)' }
+      { transform: 'translate(0,0) scale(0.9)', opacity: 0.85 },
+      { transform: `translate(${driftX}px, ${window.innerHeight * (isMobile ? 0.9 : 1.05)}px) scale(1.4)`, opacity: 0.08 }
     ], { duration, easing: 'cubic-bezier(.22,.9,.3,1)' }).onfinish = ()=> el.remove();
-
-    // twinkle loop (visual only)
     el.animate([
       { transform: 'scale(0.9)', opacity:0.75 },
       { transform: 'scale(1.2)', opacity:1 },
@@ -279,50 +298,102 @@
     ], { duration: 900 + Math.random()*700, iterations: Math.ceil(duration / 900) });
   }
 
-  // spawn loops - hearts less frequently than stars
   function spawnLoop(){
-    // spawn multiple stars per cycle for denser sparkle
-    const starCount = isMobile ? 1 : Math.floor(Math.random()*3 + 2);
-    for(let i=0;i<starCount;i++){
-      setTimeout(spawnStar, Math.random()*120);
-    }
-    // hearts
-    if(Math.random() > 0.35) spawnHeart();
+    const starCount = (window.innerWidth < 720) ? 1 : Math.floor(Math.random()*5 + 2);
+    for(let i=0;i<starCount;i++){ setTimeout(spawnStar, Math.random()*160); }
+    if(Math.random() > 0.25) spawnHeart();
     setTimeout(spawnLoop, Math.random()*(hearts.maxInterval - hearts.minInterval) + hearts.minInterval);
   }
-
   spawnLoop();
 })();
 
-/* ===== Heading animation (looping messages) ===== */
+/* ===== Headline per-letter animation (no clipping) ===== */
 (function(){
-  const el = document.getElementById('headline');
+  const HEAD = document.getElementById('headline');
+  const SUB = document.getElementById('subline');
+
   const messages = [
     "HAPPY BIRTHDAY, CRUSH",
     "HAPPY BIRTHDAY, DHANYAA",
     "HAPPY BIRTHDAY, MY LOVE",
     "MAY YOUR DAY WILL BE FULL OF JOY",
-    
     "Forever and always — with all my heart",
     "I LOVE YOU SO MUCH, MY DARLING!"
   ];
-  let idx=0;
-  function show(i){
-    el.style.opacity = 0;
+
+  const isMobile = window.matchMedia('(max-width:720px)').matches;
+  const perCharBase = isMobile ? 28 : 18; // ms per char stagger
+  let idx = 0;
+  let intervalId = null;
+
+  function setTextWithAnimation(text){
+    HEAD.innerHTML = '';
+    SUB.classList.remove('show');
+
+    // split into words and chars to avoid ugly mid-word splits
+    const words = text.split(' ');
+    words.forEach((word, wi) => {
+      const wordNode = document.createElement('span');
+      wordNode.style.whiteSpace = 'nowrap'; // keep each word together
+      word.split('').forEach((ch, i) => {
+        const span = document.createElement('span');
+        span.className = 'char';
+        span.textContent = ch;
+        const delay = ( (wi*8) + i ) * perCharBase/2 + Math.random()*10;
+        const anim = ( (i + wi) % 3 === 0 ) ? 'charWave' : 'charPop';
+        span.style.animation = `${anim} 760ms cubic-bezier(.22,.9,.3,1) ${delay}ms both`;
+        wordNode.appendChild(span);
+      });
+      // add a regular space between words
+      const space = document.createTextNode('\u00A0');
+      HEAD.appendChild(wordNode);
+      HEAD.appendChild(space);
+    });
+
+    // small shine sweep
+    const sweep = document.createElement('span');
+    sweep.style.position = 'absolute';
+    sweep.style.pointerEvents = 'none';
+    sweep.style.left = '-40%';
+    sweep.style.top = '0';
+    sweep.style.bottom = '0';
+    sweep.style.width = '40%';
+    sweep.style.background = 'linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0) 100%)';
+    sweep.style.transform = 'skewX(-18deg) translateX(-120%)';
+    sweep.style.opacity = '0.9';
+    HEAD.appendChild(sweep);
+
+    const totalDelay = Math.min(600 + HEAD.textContent.length * perCharBase / 2, 2400);
     setTimeout(()=> {
-      el.textContent = messages[i];
-      el.style.opacity = 1;
-    }, 10);
+      sweep.animate([
+        { transform: 'skewX(-18deg) translateX(-120%)', opacity:0 },
+        { transform: 'skewX(-18deg) translateX(220%)', opacity:0.75 }
+      ], { duration: 900, easing: 'ease-out' }).onfinish = ()=> { try{ sweep.remove(); }catch(e){} };
+      SUB.classList.add('show');
+      // ensure page scrolls to show headline if it's taller than viewport
+      setTimeout(()=> { window.scrollTo({ top: Math.max(0, document.querySelector('.center').offsetTop - 24), behavior: 'smooth' }); }, 80);
+    }, totalDelay);
   }
-  show(0);
-  setInterval(()=> { idx=(idx+1)%messages.length; show(idx); }, 3600);
+
+  // initial
+  setTextWithAnimation(messages[0]);
+
+  intervalId = setInterval(()=> {
+    idx = (idx + 1) % messages.length;
+    setTextWithAnimation(messages[idx]);
+  }, 4200);
+
+  window.addEventListener('beforeunload', ()=> clearInterval(intervalId));
 })();
 
-/* ===== PhotoBooth (uses uploaded image path) ===== */
+/* ===== PhotoBooth ===== */
 const PHOTOS = [
-  'DSC01926.JPG'
+  'images/DSC01931.JPG',
+  'images/DSC01926.JPG',
+  'images/DSC01932.JPG',
+  'images/DSC01933.JPG',
+  'images/DSC01970.JPG'
 ];
-
 (function(){
   const photoBtn = document.getElementById('photoBtn');
   const photomodal = document.getElementById('photoboothModal');
@@ -344,8 +415,6 @@ const PHOTOS = [
       const img=document.createElement('img');img.src=s.src;img.alt='Photo '+(i+1);
       img.onerror = ()=> img.src = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="#2b1722"/><text x="50%" y="50%" fill="#fff" font-size="22" text-anchor="middle">Image not found</text></svg>');
       wrap.appendChild(img);
-      const cap=document.createElement('div');cap.className='caption';cap.textContent=(s.src||'').split('/').pop();
-      wrap.appendChild(cap);
       slidesStage.appendChild(wrap);
     });
     show(0,true);
@@ -382,8 +451,7 @@ const PHOTOS = [
   shuffleBtn?.addEventListener('click', ()=>{ for(let i=slides.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [slides[i],slides[j]]=[slides[j],slides[i]]; } PHOTOS.length=0; slides.forEach(s=>PHOTOS.push(s.src)); build(); show(0); if(playing) restart(); });
 
   // touch support
-  (function(){
-    let sx=0, dx=0;
+  (function(){ let sx=0, dx=0;
     slidesStage.addEventListener('touchstart', e=>{ sx=e.touches[0].clientX; }, {passive:true});
     slidesStage.addEventListener('touchmove', e=>{ dx = e.touches[0].clientX - sx; }, {passive:true});
     slidesStage.addEventListener('touchend', ()=>{ if(Math.abs(dx)>60){ if(dx>0) prevBtn.click(); else nextBtn.click(); } dx=0; }, {passive:true});
@@ -391,7 +459,7 @@ const PHOTOS = [
 
 })();
 
-/* ===== Love letter modal & typing ===== */
+/* ===== Love letter typing ===== */
 (function(){
   const loveBtn = document.getElementById('loveBtn');
   const letterModal = document.getElementById('letterModal');
@@ -402,7 +470,7 @@ const PHOTOS = [
   const pauseLetter = document.getElementById('pauseLetter');
 
   const lines = [
-    "Happy Birthday, My Beautiful!",
+        "Happy Birthday, My Beautiful!",
 
 "I wish I could be there to celebrate with you today, to hold you close, and to make you feel as special as you are to me. But even though we're miles apart, I carry you with me always, and I’m counting down the days until I can see you again.", 
 
@@ -429,9 +497,10 @@ const PHOTOS = [
 "I LOVE YOU SO MUCH BANGARA❤️🫂",
     "with all my love,",
     "— your senior Mihir"
+
   ];
 
-  let t=null, li=0, ci=0, paused=false, SPEED=100;
+  let t=null, li=0, ci=0, paused=false, SPEED=110;
 
   function open(){ letterModal.classList.add('show'); letterModal.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; start(true); }
   function close(){ letterModal.classList.remove('show'); letterModal.setAttribute('aria-hidden','true'); document.body.style.overflow=''; stop(); typedLetter.textContent=''; letterCursor.style.display='none'; }
@@ -461,9 +530,176 @@ const PHOTOS = [
 
 /* accessibility: escape closes modals */
 document.addEventListener('keydown', (e)=> { if(e.key==='Escape'){ document.querySelectorAll('.modal.show').forEach(m=>{ m.classList.remove('show'); m.setAttribute('aria-hidden','true'); }); document.body.style.overflow=''; } });
-
 </script>
 </body>
+<!-- ===== Heart density + visibility control (drop-in) ===== -->
+<style>
+  /* ensure particles appear above modals when requested */
+  .particles {
+    z-index: 10005 !important; /* high so hearts are visible even when modals open */
+    pointer-events: none;
+  }
+  /* floating control button */
+  #heartsToggle {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 10010;
+    background: linear-gradient(90deg, #ff6b9f, #ffd27f);
+    color: #120407;
+    border: none;
+    padding: 10px 12px;
+    border-radius: 12px;
+    font-weight: 800;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.45);
+    cursor: pointer;
+    font-family: 'Poppins', system-ui, sans-serif;
+  }
+  #heartsToggle[aria-pressed="true"] { opacity: 0.82; transform: translateY(-2px); }
+</style>
+
+<script>
+/*
+  Drop-in hearts controller
+  - Increases heart spawn density
+  - Ensures hearts continue (or restart) when modals open
+  - Provides Pause / Resume floating button
+  - Safe to paste after your existing scripts — it will reuse the #particles element
+*/
+
+(function(){
+  const container = document.getElementById('particles');
+  if(!container){
+    console.warn('particles element not found — hearts controller skipped');
+    return;
+  }
+
+  // controller flags
+  let running = true;
+  let stopRequested = false;
+
+  // tuned density values (higher than original)
+  const isMobile = window.matchMedia('(max-width:720px)').matches;
+  const HEART_MIN = isMobile ? 8 : 14;
+  const HEART_MAX = isMobile ? 28 : 60;   // increased max
+  const HEART_MIN_INT = isMobile ? 220 : 80;  // shorter min interval -> more hearts
+  const HEART_MAX_INT = isMobile ? 480 : 240;
+
+  // helper to random int
+  const rnd = (min,max) => Math.floor(Math.random()*(max-min)+min);
+
+  function createHeart(){
+    if(!running) return;
+    const el = document.createElement('div');
+    el.className = 'heart';
+    const size = rnd(HEART_MIN, HEART_MAX);
+    el.style.width = size + 'px';
+    el.style.height = size + 'px';
+    el.style.left = (Math.random()*100) + '%';
+    el.style.top = '-12%';
+    el.style.opacity = (Math.random()*0.55 + 0.35).toFixed(2);
+    const rot = rnd(-50, 50);
+    el.style.transform = `rotate(${rot}deg)`;
+    const colors = ['#ff6b9f','#ff9ab6','#ffd27f','#ffbfd6'];
+    const color = colors[rnd(0, colors.length)];
+    el.innerHTML = `<svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet"><path fill="${color}" d="M12 21s-7.61-4.998-10-8.5C-1.5 8.2 4.5 3 7.5 5.25 9.2 6.6 12 9.25 12 9.25s2.8-2.65 4.5-3.99C19.5 3 25.5 8.2 22 12.5 19.61 16.002 12 21 12 21z"/></svg>`;
+    container.appendChild(el);
+
+    // animation
+    const driftX = (Math.random()*600 - 300); // wider drift
+    const duration = rnd(4800, 9800); // longer durations for bigger hearts
+    const endY = window.innerHeight * (isMobile ? 1.02 : 1.35);
+    const anim = el.animate([
+      { transform: `translate(0,0) rotate(${rot}deg)`, opacity: el.style.opacity },
+      { transform: `translate(${driftX}px, ${endY}px) rotate(${rot + 80}deg)`, opacity: 0.06 }
+    ], { duration, easing: 'cubic-bezier(.18,.9,.3,1)' });
+    anim.onfinish = () => { try{ el.remove(); }catch(e){} };
+  }
+
+  // spawn loop using recursive timeouts for adaptive density
+  let spawnTimer = null;
+  function spawnLoop(){
+    if(!running) return;
+    // spawn multiple hearts per cycle for density
+    const count = Math.random() > 0.6 ? rnd(1, 4) : rnd(0, 2);
+    for(let i=0;i<count;i++){
+      setTimeout(() => { if(running) createHeart(); }, Math.random()*180);
+    }
+    const next = rnd(HEART_MIN_INT, HEART_MAX_INT);
+    spawnTimer = setTimeout(spawnLoop, next);
+  }
+
+  // control API
+  function startHearts(){
+    if(running) return;
+    running = true;
+    stopRequested = false;
+    spawnLoop();
+    toggleBtn.setAttribute('aria-pressed','false');
+    toggleBtn.textContent = 'Pause Hearts';
+  }
+  function stopHearts(){
+    running = false;
+    stopRequested = true;
+    if(spawnTimer) { clearTimeout(spawnTimer); spawnTimer = null; }
+    // do not remove existing hearts immediately — let them fade naturally, or optionally remove after short delay
+    // we will leave existing hearts to complete their animations
+    toggleBtn.setAttribute('aria-pressed','true');
+    toggleBtn.textContent = 'Resume Hearts';
+  }
+
+  // create floating control
+  const toggleBtn = document.createElement('button');
+  toggleBtn.id = 'heartsToggle';
+  toggleBtn.type = 'button';
+  toggleBtn.title = 'Pause / Resume hearts';
+  toggleBtn.textContent = 'Pause Hearts';
+  toggleBtn.setAttribute('aria-pressed','false');
+  toggleBtn.addEventListener('click', ()=> {
+    if(running) stopHearts(); else startHearts();
+  });
+  document.body.appendChild(toggleBtn);
+
+  // ensure hearts run when opening modals — listen for clicks on existing modal triggers
+  function ensureRunningOnModalOpen(){
+    // selectors that open modals in your page
+    const openSelectors = ['#loveBtn', '#photoBtn'];
+    openSelectors.forEach(sel => {
+      const el = document.querySelector(sel);
+      if(!el) return;
+      el.addEventListener('click', ()=> {
+        // if user previously paused hearts, we will not auto-start (respect pause)
+        if(!stopRequested) {
+          startHearts();
+        } else {
+          // user had explicitly paused -> keep paused
+        }
+      });
+    });
+
+    // also ensure hearts visible when modal is shown via keyboard or other code (observe modal class changes)
+    const observer = new MutationObserver(muts => {
+      muts.forEach(m => {
+        if(m.type === 'attributes' && m.attributeName === 'class'){
+          // if any modal becomes .show ensure hearts visible (start if not explicitly paused)
+          if(!stopRequested){
+            const anyModalShowing = Array.from(document.querySelectorAll('.modal')).some(md => md.classList.contains('show'));
+            if(anyModalShowing) startHearts();
+          }
+        }
+      });
+    });
+    Array.from(document.querySelectorAll('.modal')).forEach(md => observer.observe(md, { attributes: true }));
+  }
+
+  // start immediately
+  spawnLoop();
+  ensureRunningOnModalOpen();
+
+  // expose small API for dev console if needed
+  window.__heartsControl = { start: startHearts, stop: stopHearts, isRunning: ()=> running };
+
+})();
+</script>
+
 </html>
-
-
